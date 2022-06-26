@@ -1,0 +1,15 @@
+.vs/
+.DS_Store
+WebApi/bin/
+WebApi/obj/
+Application/bin/
+Application/obj/
+Infrastructure/bin/
+Infrastructure/obj/
+Domain/bin/
+Domain/obj/
+Infrastructure/Migrations/
+
+# Common node modules locations
+/node_modules
+/wwwroot/node_modules
