@@ -2,8 +2,13 @@
 using Application.Contracts;
 using Application.Models;
 using Application.Models.Dto;
+using Domain.Entities;
 using Infrastructure.Identity;
+using Infrastructure.Manager;
+using Infrastructure.Repository;
 using Infrastructure.Services;
+using Infrastructure.Utils;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,10 +29,13 @@ namespace Infrastructure
             );
 
             services.Configure<TokenSetting>(configuration.GetSection("TokenSetting"));
-
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-            services.AddScoped<Application.Contracts.IUserManager<UserDto>, Infrastructure.Manager.UserManager>();
+            services.AddScoped<Application.Contracts.IUserManager<User>, Infrastructure.Manager.UserManager>();
             services.AddScoped<IAuthenticateService, AuthenticateService>();
+            services.AddScoped<IMeasurementLogsRepository, MeasurementLogsRepository>();
+            services.AddScoped<IMeasurementLogsManager<MeasurementLogs>, MeasurementLogsManager>();
+            services.AddScoped<IUserUtils, UserUtils>();
+            services.AddHttpContextAccessor();
 
             return services;
         }

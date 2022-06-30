@@ -2,6 +2,7 @@
 .DS_Store
 WebApi/bin/
 WebApi/obj/
+WebApi/obj
 Application/bin/
 Application/obj/
 Infrastructure/bin/

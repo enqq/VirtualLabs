@@ -5,6 +5,7 @@ namespace Domain.Entities
     {
         public enum UserRoles
         {
+            
             admin,
             teacher,
             student

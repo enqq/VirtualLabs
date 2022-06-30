@@ -15,9 +15,9 @@ namespace Infrastructure.Services
     public class AuthenticateService : IAuthenticateService
     {
        
-        private readonly IUserManager<UserDto> _userManager;
+        private readonly IUserManager<User> _userManager;
         private readonly TokenSetting _token;
-        public AuthenticateService(IUserManager<UserDto> userManager, IOptions<TokenSetting> token)
+        public AuthenticateService(IUserManager<User> userManager, IOptions<TokenSetting> token)
         {
             _userManager = userManager;
             _token = token.Value;
@@ -58,14 +58,14 @@ namespace Infrastructure.Services
             return await Task.FromResult(new RegisterResponse(userId));
         }
 
-        private JwtSecurityToken GenerateToken(UserDto user)
+        private JwtSecurityToken GenerateToken(User user)
         {
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.Role, user.Groups.ToString()),
-                new Claim("userId", user.ID.ToString())
+                new Claim(ClaimTypes.NameIdentifier, user.ID.ToString())
             };
 
             var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_token.Key));

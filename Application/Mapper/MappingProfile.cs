@@ -11,7 +11,9 @@ namespace Application.Mapper
         public MappingProfile()
         {
             CreateMap<User, UserDto>();
-            
+            CreateMap<MeasurementLogs, MeasurementLogsResponse>();
+            CreateMap<ValuesLogs, ValueLogsResponse>();
+            //CreateMap<List<ValuesLogs>, List<ValueLogsResponse>>();
         }
     }
 }

@@ -5,10 +5,11 @@ using AutoMapper;
 using Domain.Entities;
 using Infrastructure.Identity;
 using Infrastructure.Repository;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Manager
 {
-    public class UserManager : IUserManager<UserDto>
+    public class UserManager : IUserManager<User>
     {
         private readonly VirtualLabsDbContext _dbContext;
         private readonly IMapper _mapper;
@@ -16,8 +17,8 @@ namespace Infrastructure.Manager
         {
             _dbContext = dbContext;
             _mapper = mapper;
-        } 
-
+        }     
+ 
         public Task<bool> ExistByEmailAsync(string email)
         {
             var emailToLower = email.ToLower();
@@ -25,13 +26,18 @@ namespace Infrastructure.Manager
             return Task.FromResult(result);
         }
 
-        public Task<UserDto> GetByEmailAsync(string email)
+        public Task<User?> GetByEmailAsync(string email)
         {
             string emailToLower = email.ToLower();
             var user = _dbContext.Users.SingleOrDefault(x => x.Email.ToLower().Equals(emailToLower));
-            
-            UserDto userDto = _mapper.Map<UserDto>(user);
-            return Task.FromResult(userDto);
+                        
+            return Task.FromResult(user);
+        }
+
+       public async Task<User?> GetByIdAsync(int id)
+        {
+            var user = await _dbContext.Users.FindAsync(id);
+            return user;
         }
 
         public async Task<int> CreateUserAsync(User user)
