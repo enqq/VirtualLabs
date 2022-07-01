@@ -14,7 +14,7 @@ namespace Application.Models
 
     public class MeasurementLogsCreateRequest : MeasurementLogsRequest
     {
-        public List<ValuesLogsRequest>? Values { get; set; }
+        public List<ValuesLogsCreateRequest>? Values { get; set; }
     }
 
     public class MeasurementLogsUpdateRequest : MeasurementLogsRequest

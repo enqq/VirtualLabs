@@ -35,6 +35,8 @@ namespace Infrastructure
             services.AddScoped<IMeasurementLogsRepository, MeasurementLogsRepository>();
             services.AddScoped<IMeasurementLogsManager<MeasurementLogs>, MeasurementLogsManager>();
             services.AddScoped<IUserUtils, UserUtils>();
+            services.AddScoped<IValueLogsManager<ValuesLogs>, ValueLogsManager>();
+            services.AddScoped<IValueLogsRepository, ValueLogsRepository>();
             services.AddHttpContextAccessor();
 
             return services;

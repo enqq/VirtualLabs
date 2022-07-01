@@ -1,11 +1,7 @@
-﻿using System;
-using Application.Contracts;
-using Application.Models.Dto;
+﻿using Application.Contracts;
 using AutoMapper;
 using Domain.Entities;
 using Infrastructure.Identity;
-using Infrastructure.Repository;
-using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Manager
 {

@@ -9,6 +9,7 @@ namespace Application.Contracts
         Task<T?> GetById(int id);
         Task<bool> CheckPersmission(int id);
         IQueryable<T> Get();
+
     }
 }
 

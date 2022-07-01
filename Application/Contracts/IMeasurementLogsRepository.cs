@@ -10,6 +10,7 @@ namespace Application.Contracts
         void Remove(MeasurementLogsRequest request);
         Task<MeasurementLogsResponse> GetByIdAsync(int id);
         Task<List<ValueLogsResponse>> GetValueByNameAsync(MeasurementLogsGetRequest request);
+        Task<ValueLogsResponse> GetValueById(int id, int valueId);
         Task<IEnumerable<MeasurementLogsResponse>> Get();
 
 

@@ -13,6 +13,12 @@ namespace Domain.Entities
         
         public MeasurementLogs Parent { get; set; }
 
+        public ValuesLogs() { }
+        public ValuesLogs(string name, string value, MeasurementLogs parent)
+        {
+            (Name, Value, Parent) = (name, value, parent);
+        }
+
     }
 }
 

@@ -54,7 +54,7 @@ namespace Infrastructure.Repository
             if (log.Teacher.ID != request.TeacherID) log.Teacher = await _userManager.GetByIdAsync(request.TeacherID);
 
             log.Name = request.Name;
-            log.Values = parseToValueLogs(request.Values);
+            log.Values = updateValueLogs(log.Values, request.Values);
 
             await _measLogsManager.EditAsync(log);
             var result = _mapper.Map<MeasurementLogsResponse>(log);
@@ -93,6 +93,18 @@ namespace Infrastructure.Repository
             return response;
         }
 
+        public async Task<ValueLogsResponse> GetValueById(int id, int valueId)
+        {
+            var permission = await _measLogsManager.CheckPersmission(id);
+            if(!permission) throw new Exception("User doesn't have permission");
+
+            var log = await _measLogsManager.GetById(id);
+            var response = log.Values.SingleOrDefault(x => x.ID == valueId);
+            var mapper = _mapper.Map<ValueLogsResponse>(response);
+            return mapper;
+        }
+
+
         #region additional functions
 
         private void getValueByName(List<string> valueNames, List<ValuesLogs> destinationValueLogs, ref List<ValueLogsResponse> response)
@@ -122,22 +134,7 @@ namespace Infrastructure.Repository
             return users;
         }
 
-        private List<ValuesLogs?> parseToValueLogs(List<ValuesLogsUpdateRequest> requests)
-        {
-            var valueLogs = new List<ValuesLogs?>();
-            foreach(var item in requests)
-            {
-                valueLogs.Add(new ValuesLogs
-                {
-                    ID = item.ID,
-                    Name = item.Name,
-                    Value = item.Value
-                });
-            }
-            return valueLogs;
-        }
-
-        private void parseToValueLogs(List<ValuesLogsRequest> request, ref List<ValuesLogs> valuesLogs)
+        private void parseToValueLogs(List<ValuesLogsCreateRequest> request, ref List<ValuesLogs> valuesLogs)
         {
             foreach (var item in request)
             {
@@ -151,6 +148,35 @@ namespace Infrastructure.Repository
             }
         }
 
+        private List<ValuesLogs> updateValueLogs(List<ValuesLogs> source, List<ValuesLogsUpdateRequest> update)
+        {
+            var values = new List<ValuesLogs>();
+            foreach (var item in update)
+            {
+                if (item?.ID is null || item?.ID == 0)
+                {
+                    values.Add(new ValuesLogs
+                    {
+                        Name = item.Name,
+                        Value = item.Value
+                    });
+                }
+                else
+                {
+                    var value = source?.SingleOrDefault(x => x.ID == item.ID);
+                    if (value != null)
+                    {
+                        value.Name = item.Name;
+                        value.Value = item.Value;
+                        value.Modified = DateTime.Now;
+
+                        values.Add(value);
+                    }
+                }
+            }
+            return values;
+        }
+
         private bool compareIntList(List<int> source, List<int> source2)
         {
             if (source is null || source2 is null) return false;
@@ -161,6 +187,7 @@ namespace Infrastructure.Repository
             }
             return true;
         }
+
         #endregion
 
     }

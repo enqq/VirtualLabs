@@ -76,7 +76,21 @@ namespace WebApi.Controllers
             }
         }
 
-        [HttpGet("values")]
+        [HttpGet("{id:int}/{idValue:int}")]
+        public async Task<IActionResult> GetValueById(int id, int idValue)
+        {
+            try
+            {
+                var response = await _mesLogsRepository.GetValueById(id, idValue);
+                return Ok(response);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet("value")]
         public async Task<IActionResult> GetValueByName(MeasurementLogsGetRequest request)
         {
             try
