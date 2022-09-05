@@ -102,6 +102,61 @@ namespace WebApi.Controllers
                 return BadRequest(e.Message);
             }
         }
+
+        [HttpPost("insert/user")]
+        public async Task<IActionResult> InserUser([FromBody] MeasurmentLogsSharedRequest request)
+        {
+            try
+            {
+                var response = await _mesLogsRepository.InsertUser(request);
+                return Ok(response);
+            } catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpDelete("remove/user")]
+        public async Task<IActionResult> RemoveUser([FromBody] MeasurmentLogsSharedRequest request)
+        {
+            try
+            {
+                var response = await _mesLogsRepository.RemoveUser(request);
+                return Ok(response);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPost("insert/group")]
+        public async Task<IActionResult> InsertGroup([FromBody] MeasurmentLogsSharedRequest request)
+        {
+            try
+            {
+                var response = await _mesLogsRepository.InsertGroup(request);
+                return Ok(response);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpDelete("remove/group")]
+        public async Task<IActionResult> RemoveGroup([FromBody] MeasurmentLogsSharedRequest request)
+        {
+            try
+            {
+                var response = await _mesLogsRepository.RemoveGroup(request);
+                return Ok(response);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
     }
 }
 

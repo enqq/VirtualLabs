@@ -37,6 +37,8 @@ namespace Infrastructure
             services.AddScoped<IUserUtils, UserUtils>();
             services.AddScoped<IValueLogsManager<ValuesLogs>, ValueLogsManager>();
             services.AddScoped<IValueLogsRepository, ValueLogsRepository>();
+            services.AddScoped<IUserGroupsRepository, UserGroupsRepository>();
+            services.AddScoped<IUserGroupsManager<UserGroup>, UserGroupsManager>();
             services.AddHttpContextAccessor();
 
             return services;

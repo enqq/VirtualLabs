@@ -16,7 +16,8 @@ namespace Domain.Entities
         public string? AlbumNumber { get; set; }
         public bool Active { get; set; } = false;
 
-        public UserRoles Groups { get; set; }
+        public List<UserGroup> UserGroups { get; set; }
+        public UserRoles UserRole { get; set; } = UserRoles.student;
     }
 }
 

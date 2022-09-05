@@ -2,6 +2,7 @@
 using Application.Models;
 using AutoMapper;
 using Domain.Entities;
+using static Domain.Entities.Enums;
 
 namespace Infrastructure.Repository
 {
@@ -9,15 +10,25 @@ namespace Infrastructure.Repository
     {
         private readonly IMeasurementLogsManager<MeasurementLogs> _measLogsManager;
         private readonly IUserManager<User> _userManager;
+        private readonly IUserGroupsManager<UserGroup> _userGroupManager;
         private readonly IMapper _mapper;
 
 
-        public MeasurementLogsRepository(IMeasurementLogsManager<MeasurementLogs> measLogsManager, IUserManager<User> userManager, IMapper mapper)
+        public MeasurementLogsRepository(IMeasurementLogsManager<MeasurementLogs> measLogsManager, IUserManager<User> userManager, IUserGroupsManager<UserGroup> userGroupManager, IMapper mapper)
         {
             _measLogsManager = measLogsManager;
             _userManager = userManager;
+            _userGroupManager = userGroupManager;
             _mapper = mapper;
 
+        }
+
+        public async Task<IEnumerable<MeasurementLogsResponse>> Get()
+        {
+            var response = _measLogsManager.Get();
+            Console.WriteLine(response.First().Name);
+            var map = _mapper.Map<IEnumerable<MeasurementLogsResponse>>(response);
+            return await Task.FromResult(map);
         }
 
         public async Task<MeasurementLogsResponse> AddAsync(MeasurementLogsCreateRequest request)
@@ -49,9 +60,13 @@ namespace Infrastructure.Repository
 
             var log = await _measLogsManager.GetById(request.ID);
             var parseToListId = log.SharedFor?.Select(x => x.ID).ToList();
+            var groupsId = log.SharedForGroups?.Select(x => x.ID).ToList();
+
             if (log == null) throw new Exception("Measurement Logs doesn't exist");
             if (!compareIntList(parseToListId, request.SharedFor)) log.SharedFor = await findUsersAsync(request.SharedFor);
+            if (!compareIntList(groupsId, request.SharedForGroup)) log.SharedForGroups = await findGroupsAsync(request.SharedForGroup);
             if (log.Teacher.ID != request.TeacherID) log.Teacher = await _userManager.GetByIdAsync(request.TeacherID);
+
 
             log.Name = request.Name;
             log.Values = updateValueLogs(log.Values, request.Values);
@@ -65,13 +80,6 @@ namespace Infrastructure.Repository
         public void Remove(MeasurementLogsRequest request)
         {
             throw new NotImplementedException();
-        }
-
-        public async Task<IEnumerable<MeasurementLogsResponse>> Get()
-        {
-            var response =  _measLogsManager.Get();
-            var map = _mapper.Map<IEnumerable<MeasurementLogsResponse>>(response);
-            return await Task.FromResult(map);
         }
 
         public async Task<MeasurementLogsResponse> GetByIdAsync(int id)
@@ -104,6 +112,83 @@ namespace Infrastructure.Repository
             return mapper;
         }
 
+        public async Task<MeasurementLogsResponse> InsertUser(MeasurmentLogsSharedRequest request)
+        {
+            var permission = _measLogsManager.CheckPersmission(new UserRoles[] { UserRoles.admin, UserRoles.teacher });
+            if (!permission) throw new Exception("User doesn't have permission");
+
+            var log = await _measLogsManager.GetById(request.ID);
+            if(log == null) throw new Exception("Measurement Logs doesn't exist");
+
+            var idUsers = log.SharedFor.Select(x => x.ID);
+            if (idUsers.Contains(request.ForeginID)) return await Task.FromResult(_mapper.Map<MeasurementLogsResponse>(log));
+            
+                var findUser = await _userManager.GetByIdAsync(request.ForeginID);
+                if (findUser == null) throw new Exception("User don't exist");
+                log.SharedFor.Add(findUser);
+                var response = await _measLogsManager.EditAsync(log);
+                var mapper = _mapper.Map<MeasurementLogsResponse>(response);
+                return await Task.FromResult(mapper);        
+        }
+
+        public async Task<MeasurementLogsResponse> RemoveUser(MeasurmentLogsSharedRequest request)
+        {
+            var permission = _measLogsManager.CheckPersmission(new UserRoles[] { UserRoles.admin, UserRoles.teacher });
+            if (!permission) throw new Exception("User doesn't have permission");
+
+            var log = await _measLogsManager.GetById(request.ID);
+            if (log == null) throw new Exception("Measurement Logs doesn't exist");
+
+            var idUsers = log.SharedFor.Select(x => x.ID);
+            if (!idUsers.Contains(request.ForeginID)) throw new Exception("Measurement Logs doesn't contain user");
+
+            var findUser = await _userManager.GetByIdAsync(request.ForeginID);
+            if (findUser == null) throw new Exception("User doesn't exist");
+            log.SharedFor.Remove(findUser);
+            var response = await _measLogsManager.EditAsync(log);
+            var mapper = _mapper.Map<MeasurementLogsResponse>(response);
+            return await Task.FromResult(mapper);
+        }
+
+        public async Task<MeasurementLogsResponse> InsertGroup(MeasurmentLogsSharedRequest request)
+        {
+            var permission = _measLogsManager.CheckPersmission(new UserRoles[] { UserRoles.admin, UserRoles.teacher });
+            if (!permission) throw new Exception("User doesn't have permission");
+
+            var log = await _measLogsManager.GetById(request.ID);
+            if (log == null) throw new Exception("Measurement Logs doesn't exist");
+
+            var groupsID = log.SharedForGroups?.Select(x => x.ID).Where(x => x == request.ID);
+            if (groupsID != null) return await Task.FromResult(_mapper.Map<MeasurementLogsResponse>(log));
+
+            var findGroup = await _userGroupManager.GetByIdAsync(request.ForeginID);
+            if (findGroup == null) throw new Exception("Group doesn't exist");
+            log.SharedForGroups.Add(findGroup);
+            var response = await _measLogsManager.EditAsync(log);
+            var mapper = _mapper.Map<MeasurementLogsResponse>(response);
+            return await Task.FromResult(mapper);
+        }
+
+        public async Task<MeasurementLogsResponse> RemoveGroup(MeasurmentLogsSharedRequest request)
+        {
+            var permission = _measLogsManager.CheckPersmission(new UserRoles[] { UserRoles.admin, UserRoles.teacher });
+            if (!permission) throw new Exception("User doesn't have permission");
+
+            var log = await _measLogsManager.GetById(request.ID);
+            if (log == null) throw new Exception("Measurement Logs doesn't exist");
+
+            var groupsId = log.SharedForGroups.Select(x => x.ID);
+            if (groupsId.Contains(request.ForeginID)) throw new Exception("Measurement Logs doesn't contain group");
+
+            var findGroup = await _userGroupManager.GetByIdAsync(request.ForeginID);
+            if (findGroup == null) throw new Exception("Group doesn't exist");
+            log.SharedForGroups.Add(findGroup);
+            var response = await _measLogsManager.EditAsync(log);
+            var mapper = _mapper.Map<MeasurementLogsResponse>(response);
+            return await Task.FromResult(mapper);
+        }
+
+
 
         #region additional functions
 
@@ -132,6 +217,17 @@ namespace Infrastructure.Repository
                 if (user != null) users.Add(user);
             }
             return users;
+        }
+
+        private async Task<List<UserGroup>> findGroupsAsync(List<int> idList)
+        {
+            var groups = new List<UserGroup>();
+            foreach (var item in idList)
+            {
+                var group = await _userGroupManager.GetByIdAsync(item);
+                if (group != null) groups.Add(group);
+            }
+            return groups;
         }
 
         private void parseToValueLogs(List<ValuesLogsCreateRequest> request, ref List<ValuesLogs> valuesLogs)

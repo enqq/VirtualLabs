@@ -13,6 +13,8 @@ namespace Application.Mapper
             CreateMap<User, UserDto>();
             CreateMap<MeasurementLogs, MeasurementLogsResponse>();
             CreateMap<ValuesLogs, ValueLogsResponse>();
+            CreateMap<User, UserResponse>();
+            CreateMap<UserGroup, UserGroupsResponse>();
             //CreateMap<List<ValuesLogs>, List<ValueLogsResponse>>();
         }
     }

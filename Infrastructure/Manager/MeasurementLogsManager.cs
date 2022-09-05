@@ -11,13 +11,15 @@ namespace Infrastructure.Manager
     public class MeasurementLogsManager : IMeasurementLogsManager<MeasurementLogs>
     {
         private readonly VirtualLabsDbContext _dbContext;
+        private readonly IUserManager<User> _userManager;
         private IQueryable<MeasurementLogs> _logs; 
         private readonly IUserUtils _user;
-        public MeasurementLogsManager(VirtualLabsDbContext dbContext, IUserUtils user)
+        public MeasurementLogsManager(VirtualLabsDbContext dbContext, IUserManager<User> userManager, IUserUtils user)
         {
             _dbContext = dbContext;
+            _userManager = userManager;
             _user = user;
-            _logs = userPersmission();
+            _logs = userPersmissionAsync();
         }
 
         public IQueryable<MeasurementLogs> Get() => _logs;
@@ -53,17 +55,30 @@ namespace Infrastructure.Manager
             return await _logs.AnyAsync(x => x.ID == id);
         }
 
-        private IQueryable<MeasurementLogs> userPersmission()
+        public bool CheckPersmission(UserRoles[] roles)
+        {
+            foreach (var role in roles)
+            {
+                if (_user.GetRole() == role) return true;
+            }
+
+            return false;
+        }
+
+        private  IQueryable<MeasurementLogs> userPersmissionAsync()
         {
             var uId = int.Parse(_user.GetUserId());
+            IQueryable<MeasurementLogs> measurementLogs = _dbContext.MeasurementLogs.Include(x => x.Teacher).Include(x => x.SharedFor).Include(x => x.SharedForGroups).Include(x => x.Values).AsQueryable();
             switch (_user.GetRole())
             {          
                 case UserRoles.admin:
-                    return _dbContext.MeasurementLogs.Include(x => x.Teacher).Include(x => x.SharedFor).Include(x => x.Values).AsQueryable();                  
+                    return measurementLogs;                  
                 case UserRoles.teacher:
-                    return _dbContext.MeasurementLogs.Where(x => x.Teacher.ID == uId).Include(x => x.Teacher).Include(x => x.SharedFor).Include(x => x.Values).AsQueryable();
+                    return measurementLogs.Where(x => x.Teacher.ID == uId);
                 default:
-                    return _dbContext.MeasurementLogs.Where(x => x.SharedFor.Select(x => x.ID).Contains(uId)).Include(x => x.Teacher).Include(x => x.SharedFor).Include(x => x.Values).AsQueryable();
+                    var user = _dbContext.Users.Find(uId);
+                    var result = measurementLogs.Where(x => x.SharedFor.Select(x => x.ID).Contains(uId) || x.SharedForGroups.Any(x => x.Users.Contains(user))).Distinct();
+                    return result;
             }
         }
 

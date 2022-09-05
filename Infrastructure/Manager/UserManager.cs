@@ -2,6 +2,7 @@
 using AutoMapper;
 using Domain.Entities;
 using Infrastructure.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Manager
 {
@@ -32,7 +33,7 @@ namespace Infrastructure.Manager
 
        public async Task<User?> GetByIdAsync(int id)
         {
-            var user = await _dbContext.Users.FindAsync(id);
+            var user = await _dbContext.Users.Include(x => x.UserGroups).FirstAsync(x => x.ID == id);
             return user;
         }
 

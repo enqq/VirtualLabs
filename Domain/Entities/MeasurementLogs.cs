@@ -12,7 +12,7 @@ namespace Domain.Entities
         public User? Teacher { get; set; }
         //public User CreatedBy { get; set; }
         public List<User>? SharedFor { get; set; }
-
+        public List<UserGroup?> SharedForGroups { get; set; }
 
     }
 }
