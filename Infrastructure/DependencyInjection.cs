@@ -21,7 +21,9 @@ namespace Infrastructure
       IConfiguration configuration)
         {
 
-            
+            //ks conneciton string dla windowsa
+            //var connectionString = "Server=127.0.0.1,3306;User=root;Database=VirtualLabs";
+            //dk connection string mac
             var connectionString = "Server=127.0.0.1,3306;User=root;Password=admin;Database=VirtualLabs";
             services.AddDbContext<VirtualLabsDbContext>(options =>
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))

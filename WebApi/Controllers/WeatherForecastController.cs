@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Web.Http.Cors;
 
 namespace WebApi.Controllers;
 
+[EnableCors(origins: "*", headers: "*", methods: "*")]
 [ApiController]
 [Route("[controller]")]
 public class WeatherForecastController : ControllerBase
