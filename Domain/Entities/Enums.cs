@@ -6,9 +6,9 @@ namespace Domain.Entities
         public enum UserRoles
         {
             
-            admin,
-            teacher,
-            student
+            admin = 0,
+            teacher = 1,
+            student = 2
         };
     }
 }

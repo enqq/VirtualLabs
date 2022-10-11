@@ -41,6 +41,7 @@ namespace Infrastructure
             services.AddScoped<IValueLogsRepository, ValueLogsRepository>();
             services.AddScoped<IUserGroupsRepository, UserGroupsRepository>();
             services.AddScoped<IUserGroupsManager<UserGroup>, UserGroupsManager>();
+            services.AddScoped<IUserRepository, UserRepository>();
             services.AddHttpContextAccessor();
 
             return services;

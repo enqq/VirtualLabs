@@ -12,5 +12,10 @@ namespace Application.Models
         public string PostCode { get; set; }
         public string? AlbumNumber { get; set; }
     }
+
+    public class RegisterFullRequest: RegisterRequest
+    {
+        public int RoleId { get; set; } = 2;
+    }
 }
 

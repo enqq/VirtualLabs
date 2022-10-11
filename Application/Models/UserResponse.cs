@@ -1,4 +1,6 @@
 ﻿using System;
+using static Domain.Entities.Enums;
+
 namespace Application.Models
 {
     public class UserResponse
@@ -16,6 +18,7 @@ namespace Application.Models
         public string City { get; set; }
         public string PostCode { get; set; }
         public bool Active { get; set; }
+        public UserRoles UserRole { get; set; }
     }
 }
 

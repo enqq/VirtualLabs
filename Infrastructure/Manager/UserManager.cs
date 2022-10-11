@@ -3,6 +3,7 @@ using AutoMapper;
 using Domain.Entities;
 using Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
+using static Domain.Entities.Enums;
 
 namespace Infrastructure.Manager
 {
@@ -15,7 +16,20 @@ namespace Infrastructure.Manager
             _dbContext = dbContext;
             _mapper = mapper;
         }     
- 
+
+        public async Task<List<User>> GetUsers()
+        {
+            var users = await _dbContext.Users.Include(x => x.UserGroups).ToListAsync();
+            return users;
+        }
+
+        public async Task<List<User>> GetUserByRole(UserRoles userRole)
+        {
+
+            var users = await _dbContext.Users?.Where(x => x.UserRole == userRole).Include(x => x.UserGroups).ToListAsync();
+            return users;
+        }
+
         public Task<bool> ExistByEmailAsync(string email)
         {
             var emailToLower = email.ToLower();
@@ -42,6 +56,14 @@ namespace Infrastructure.Manager
             await _dbContext.AddAsync(user);
             await _dbContext.SaveChangesAsync();
             return await Task.FromResult(user.ID);
+        }
+
+        public async Task<User> UpdateUserAsync(User user)
+        {
+            user.Modified = DateTime.Now;
+            _dbContext.Entry(user).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync();
+            return user;
         }
         
     }

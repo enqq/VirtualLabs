@@ -14,6 +14,7 @@ namespace Application.Mapper
             CreateMap<MeasurementLogs, MeasurementLogsResponse>();
             CreateMap<ValuesLogs, ValueLogsResponse>();
             CreateMap<User, UserResponse>();
+            CreateMap<User, UserFullResponse>();
             CreateMap<UserGroup, UserGroupsResponse>();
             //CreateMap<List<ValuesLogs>, List<ValueLogsResponse>>();
         }
