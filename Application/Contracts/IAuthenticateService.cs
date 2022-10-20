@@ -7,6 +7,9 @@ namespace Application.Contracts
     {
         Task<AuthenticationResponse> AuthenticateAsync(AuthenticationRequest request);
         Task<RegisterResponse> RegisterAsync(RegisterRequest request);
+        Task<String> ResetPasswordToken(string email);
+        Task<BaseResponse> ResetPassword(ResetPasswordRequest request);
+        Task<BaseResponse> CheckPasswordToken(string token);
     }
 }
 

@@ -37,6 +37,12 @@ namespace Infrastructure.Manager
             return Task.FromResult(result);
         }
 
+        public Task<bool> ExistById(int id)
+        {
+            var result = _dbContext.Users.Any(x => x.ID == id);
+            return Task.FromResult(result);
+        }
+
         public Task<User?> GetByEmailAsync(string email)
         {
             string emailToLower = email.ToLower();
@@ -62,6 +68,15 @@ namespace Infrastructure.Manager
         {
             user.Modified = DateTime.Now;
             _dbContext.Entry(user).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync();
+            return user;
+        }
+
+        public async Task<User> ChangedPassword(byte[] password, int userId)
+        {
+            var user = await _dbContext.Users.FindAsync(userId);
+            user.Password = password;
+            user.Modified = DateTime.Now;
             await _dbContext.SaveChangesAsync();
             return user;
         }

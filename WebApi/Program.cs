@@ -71,6 +71,10 @@ builder.Services.AddAuthentication(x =>
     };
 });
 
+builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
+options.TokenLifespan = TimeSpan.FromMinutes(1)
+);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

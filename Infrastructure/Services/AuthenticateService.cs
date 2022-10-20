@@ -58,6 +58,38 @@ namespace Infrastructure.Services
             return await Task.FromResult(new RegisterResponse(userId));
         }
 
+        public async Task<String> ResetPasswordToken(string email)
+        {
+            if (!await _userManager.ExistByEmailAsync(email)) throw new Exception("User doesn't exist");
+            var user = await _userManager.GetByEmailAsync(email);
+            var generateToken = GeneratePasswordResetToken(user);
+            var token = new JwtSecurityTokenHandler().WriteToken(generateToken);
+            return await Task.FromResult(token);
+        }
+        public async Task<BaseResponse> CheckPasswordToken(string token)
+        {
+
+                var jwt = new JwtSecurityToken(token);
+                if (jwt.ValidFrom > DateTime.UtcNow || jwt.ValidTo < DateTime.UtcNow) throw new Exception("Token is invalid");
+                return await Task.FromResult(new BaseResponse(message: "Token is valid", status: true));
+
+        }
+
+        public async Task<BaseResponse> ResetPassword(ResetPasswordRequest request)
+        {
+            var jwt = new JwtSecurityToken(request.Token);
+            if (jwt.ValidFrom > DateTime.UtcNow || jwt.ValidTo < DateTime.UtcNow) throw new Exception("Token is invalid");
+            if (String.Compare(request.Password, request.Password) != 0) throw new Exception("Repeat password is incorrect");
+
+            var id = jwt.Claims.Single(x => x.Type == ClaimTypes.NameIdentifier);
+            if (!await _userManager.ExistById(int.Parse(id.Value))) throw new Exception("User doesn't exist");
+
+            var newPassword = PasswordUtils.GeneratePassword(request.Password);
+            await _userManager.ChangedPassword(newPassword, int.Parse(id.Value));
+
+            return await Task.FromResult(new BaseResponse(message: "Password changed", status: true));
+        }
+
         private JwtSecurityToken GenerateToken(User user)
         {
             var claims = new[]
@@ -81,7 +113,17 @@ namespace Infrastructure.Services
             return jwtSecurityToken;
         }
 
-
+        private JwtSecurityToken GeneratePasswordResetToken(User user)
+        {
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.ID.ToString())           
+            };
+            var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_token.Key));
+            var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
+            var jwt = new JwtSecurityToken(claims: claims, expires: DateTime.UtcNow.AddHours(2), notBefore: DateTime.UtcNow);
+            return jwt;
+        }
 
     }
 }
