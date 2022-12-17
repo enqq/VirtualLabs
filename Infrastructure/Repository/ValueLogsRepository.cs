@@ -24,7 +24,7 @@ namespace Infrastructure.Repository
             if (!await permission) throw new Exception("User doesn't have permission to create new value");
 
             var log = await _measManager.GetById(request.LogsID);
-            var model = new ValuesLogs(request.Name, request.Value, log);
+            var model = new ValuesLogs(request.Name, request.Value, request.Type, request.Format, log);
             var result = await _vManager.AddAsync(model);
 
             return _mapper.Map<ValueLogsResponse>(result);
@@ -37,6 +37,8 @@ namespace Infrastructure.Repository
 
             var valueLog = await _vManager.GetById(request.ID);
             valueLog.Value = request.Value;
+            valueLog.Type = request.Type;
+            valueLog.Format = request.Format;
             valueLog.Modified = DateTime.Now;
             if (request.Name != null) valueLog.Name = request.Name;
             var response = await _vManager.EditAsync(valueLog);
