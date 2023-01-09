@@ -25,8 +25,17 @@ namespace Application.Models
         public int ID { get; set; }
         [Required]
         public int LogID { get; set; }
-
         public string? Name { get; set; }
         
     }
+
+    public class ValueLogsListUpdateRequest: ValuesLogsRequest
+    {
+        [Required]
+        public string Name { get; set; }
+        [Required]
+        public int ID { get; set; }
+    }
+
+
 }

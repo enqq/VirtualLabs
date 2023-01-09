@@ -8,8 +8,18 @@ namespace Application.Models
         public string Value { get; set; }
         public string? Type { get; set; }
         public string? Format { get; set; }
-        public DateTime Created { get; set; }
-        public DateTime? Modified { get; set; }
+        public PositionResponse? Position { get; set; }
+        //public DateTime Created { get; set; }
+        //public DateTime? Modified { get; set; }
+    }
+
+    public class ValueLogsPositionResponse
+    {
+        public int ID { get; set; }
+        public string Name { get; set; }
+        public string Value { get; set; }
+        public string? Type { get; set; }
+        public string? Format { get; set; }
     }
 }
 

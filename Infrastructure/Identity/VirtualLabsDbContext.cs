@@ -14,6 +14,8 @@ namespace Infrastructure.Identity
         public DbSet<MeasurementLogs> MeasurementLogs { get; set; }
         public DbSet<ValuesLogs> ValuesLogs { get; set; }
         public DbSet<UserGroup> UserGroups { get; set; }
+        public DbSet<Lab> Labs { get; set; }
+        public DbSet<Position> Positions {get;set;}
 
     }
 }

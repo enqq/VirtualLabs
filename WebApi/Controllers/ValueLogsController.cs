@@ -43,6 +43,19 @@ namespace WebApi.Controllers
                 return BadRequest(e.Message);
             }
         }
+
+        [HttpPost("insertPosition/{value:int}/{position:int}")]
+        public async Task<IActionResult> InsertToPosition(int value, int position)
+        {
+            try
+            {
+                var response = await _vRepository.InsertToPosition(value, position);
+                return Ok(response);
+            } catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
     }
 }
 

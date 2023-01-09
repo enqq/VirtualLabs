@@ -8,6 +8,7 @@ namespace Domain.Entities
     {
         
         public string Name { get; set; }
+        public Lab? Lab { get; set; }
         public List<ValuesLogs?> Values { get; set; }
         public User? Teacher { get; set; }
         //public User CreatedBy { get; set; }

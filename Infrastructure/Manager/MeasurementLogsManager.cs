@@ -68,7 +68,7 @@ namespace Infrastructure.Manager
         private  IQueryable<MeasurementLogs> userPersmissionAsync()
         {
             var uId = int.Parse(_user.GetUserId());
-            IQueryable<MeasurementLogs> measurementLogs = _dbContext.MeasurementLogs.Include(x => x.Teacher).Include(x => x.SharedFor).Include(x => x.SharedForGroups).Include(x => x.Values).AsQueryable();
+            IQueryable<MeasurementLogs> measurementLogs = _dbContext.MeasurementLogs.Include(x => x.Teacher).Include(x => x.SharedFor).Include(x => x.SharedForGroups).Include(x => x.Values).Include(x => x.Lab).AsQueryable();
             switch (_user.GetRole())
             {          
                 case UserRoles.admin:

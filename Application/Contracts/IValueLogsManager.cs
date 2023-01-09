@@ -9,6 +9,7 @@ namespace Application.Contracts
         Task<T> AddAsync(ValuesLogs value);
         Task<T> EditAsync(ValuesLogs value);
         Task<ValuesLogs?> GetById(int id, Expression<Func<ValuesLogs, object>>? include = null);
+        bool CheckPosition(int valueId, int positionId);
     }
 }
 

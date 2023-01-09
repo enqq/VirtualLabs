@@ -9,14 +9,16 @@ namespace Infrastructure.Repository
     public class MeasurementLogsRepository : IMeasurementLogsRepository
     {
         private readonly IMeasurementLogsManager<MeasurementLogs> _measLogsManager;
+        private readonly ILabManager _labManager;
         private readonly IUserManager<User> _userManager;
         private readonly IUserGroupsManager<UserGroup> _userGroupManager;
         private readonly IMapper _mapper;
 
 
-        public MeasurementLogsRepository(IMeasurementLogsManager<MeasurementLogs> measLogsManager, IUserManager<User> userManager, IUserGroupsManager<UserGroup> userGroupManager, IMapper mapper)
+        public MeasurementLogsRepository(IMeasurementLogsManager<MeasurementLogs> measLogsManager, ILabManager labManager, IUserManager<User> userManager, IUserGroupsManager<UserGroup> userGroupManager, IMapper mapper)
         {
             _measLogsManager = measLogsManager;
+            _labManager = labManager;
             _userManager = userManager;
             _userGroupManager = userGroupManager;
             _mapper = mapper;
@@ -36,17 +38,25 @@ namespace Infrastructure.Repository
             var sharedFor = new List<User>();
             var valuesLogs = new List<ValuesLogs>();
             var teacher = await _userManager.GetByIdAsync(request.TeacherID);
-
+            Lab lab = null;
             if (teacher == null) throw new Exception("Don't find user");
             if (request.SharedFor.Count > 0) sharedFor = await findUsersAsync(request.SharedFor);
             if (request.Values.Count > 0) parseToValueLogs(request.Values, ref valuesLogs);
+            if (request.LabID != null)
+            {
+                lab = await _labManager.GetById((int)request.LabID);
+                if (lab == null) throw new Exception("Lab doesn't exist");
+          
+            }
 
             var model = new MeasurementLogs {
                 Name = request.Name,
+                Lab = lab,
                 Teacher = teacher,
                 Values = valuesLogs,
                 SharedFor = sharedFor
             };
+
 
             var addResult = await _measLogsManager.CreateAsync(model);
             var response = _mapper.Map<MeasurementLogsResponse>(addResult);
@@ -61,15 +71,21 @@ namespace Infrastructure.Repository
             var log = await _measLogsManager.GetById(request.ID);
             var parseToListId = log.SharedFor?.Select(x => x.ID).ToList();
             var groupsId = log.SharedForGroups?.Select(x => x.ID).ToList();
+            Lab lab = null;
 
             if (log == null) throw new Exception("Measurement Logs doesn't exist");
             if (!compareIntList(parseToListId, request.SharedFor)) log.SharedFor = await findUsersAsync(request.SharedFor);
             if (!compareIntList(groupsId, request.SharedForGroup)) log.SharedForGroups = await findGroupsAsync(request.SharedForGroup);
             if (log.Teacher.ID != request.TeacherID) log.Teacher = await _userManager.GetByIdAsync(request.TeacherID);
-
+            if (request.LabID != null)
+            {
+                lab = await _labManager.GetById((int)request.LabID);
+                if (lab == null) throw new Exception("Lab doesn't exist");
+            }
 
             log.Name = request.Name;
             log.Values = updateValueLogs(log.Values, request.Values);
+            log.Lab = lab;
 
             await _measLogsManager.EditAsync(log);
             var result = _mapper.Map<MeasurementLogsResponse>(log);
@@ -211,6 +227,7 @@ namespace Infrastructure.Repository
         private async Task<List<User>> findUsersAsync(List<int> idList)
         {
             var users = new List<User>();
+            if (users.Count == 0) return users;
             foreach (var item in idList)
             {
                 var user = await _userManager.GetByIdAsync(item);
@@ -222,6 +239,7 @@ namespace Infrastructure.Repository
         private async Task<List<UserGroup>> findGroupsAsync(List<int> idList)
         {
             var groups = new List<UserGroup>();
+            if (groups.Count == 0) return groups;
             foreach (var item in idList)
             {
                 var group = await _userGroupManager.GetByIdAsync(item);
@@ -244,7 +262,7 @@ namespace Infrastructure.Repository
             }
         }
 
-        private List<ValuesLogs> updateValueLogs(List<ValuesLogs> source, List<ValuesLogsUpdateRequest> update)
+        private List<ValuesLogs> updateValueLogs(List<ValuesLogs> source, List<ValueLogsListUpdateRequest> update)
         {
             var values = new List<ValuesLogs>();
             foreach (var item in update)

@@ -11,6 +11,7 @@ namespace Application.Models
         public int TeacherID { get; set; }       
         public List<int>? SharedFor { get; set; }
         public List<int>? SharedForGroup { get; set; }
+        public int? LabID { get; set; }
     }
 
     public class MeasurementLogsCreateRequest : MeasurementLogsRequest
@@ -22,7 +23,7 @@ namespace Application.Models
     {
         [Required]
         public int ID { get; set; }
-        public List<ValuesLogsUpdateRequest>? Values { get; set; }
+        public List<ValueLogsListUpdateRequest>? Values { get; set; }
     }
 
     public class MeasurmentLogsSharedRequest

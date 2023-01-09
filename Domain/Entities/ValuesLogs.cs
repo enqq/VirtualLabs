@@ -11,7 +11,7 @@ namespace Domain.Entities
         public string? Value { get; set; }
         public string? Type { get; set; }
         public string? Format { get; set; }
-        
+        public Position? Position { get; set; }
         public MeasurementLogs Parent { get; set; }
 
         public ValuesLogs() { }

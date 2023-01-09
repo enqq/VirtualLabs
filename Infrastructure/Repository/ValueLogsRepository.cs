@@ -10,10 +10,12 @@ namespace Infrastructure.Repository
     {
         private readonly IMeasurementLogsManager<MeasurementLogs> _measManager;
         private readonly IValueLogsManager<ValuesLogs> _vManager;
+        private readonly IPositionManager _positionManager;
         private readonly IMapper _mapper;
-        public ValueLogsRepository(IMeasurementLogsManager<MeasurementLogs> measManager, IValueLogsManager<ValuesLogs> vManager, IMapper mapper) 
+        public ValueLogsRepository(IMeasurementLogsManager<MeasurementLogs> measManager, IValueLogsManager<ValuesLogs> vManager, IPositionManager positionManager, IMapper mapper) 
         {
             _measManager = measManager;
+            _positionManager = positionManager;
             _vManager = vManager;
             _mapper = mapper;
         }
@@ -45,6 +47,19 @@ namespace Infrastructure.Repository
 
             var mapper = _mapper.Map<ValueLogsResponse>(response);
             return await Task.FromResult(mapper);
+        }
+
+        public async Task<ValueLogsResponse> InsertToPosition(int valueId, int positionId)
+        {
+            if (!_vManager.CheckPosition(valueId, positionId)) throw new Exception("ValueID or PositionID is inncorect");
+            
+                var value = await _vManager.GetById(valueId);
+                var position = await _positionManager.GetById(positionId);
+                value.Position = position;
+                var updateValue = await _vManager.EditAsync(value);
+                var mapper = _mapper.Map<ValueLogsResponse>(updateValue);
+                return await Task.FromResult(mapper);
+            
         }
     }
 }

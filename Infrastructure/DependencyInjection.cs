@@ -33,15 +33,28 @@ namespace Infrastructure
             services.Configure<TokenSetting>(configuration.GetSection("TokenSetting"));
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddScoped<Application.Contracts.IUserManager<User>, Infrastructure.Manager.UserManager>();
+            // Auth
             services.AddScoped<IAuthenticateService, AuthenticateService>();
+            // Measurement Logs
             services.AddScoped<IMeasurementLogsRepository, MeasurementLogsRepository>();
             services.AddScoped<IMeasurementLogsManager<MeasurementLogs>, MeasurementLogsManager>();
+            // User Utils
             services.AddScoped<IUserUtils, UserUtils>();
+            // Value Logs
             services.AddScoped<IValueLogsManager<ValuesLogs>, ValueLogsManager>();
             services.AddScoped<IValueLogsRepository, ValueLogsRepository>();
+            // Usergroups
             services.AddScoped<IUserGroupsRepository, UserGroupsRepository>();
+            // User
             services.AddScoped<IUserGroupsManager<UserGroup>, UserGroupsManager>();
             services.AddScoped<IUserRepository, UserRepository>();
+            // Position
+            services.AddScoped<IPositionManager, PositionManager>();
+            services.AddScoped<IPositionRepository, PositionRepository>();
+            // Lab
+            services.AddScoped<ILabManager, LabManager>();
+            services.AddScoped<ILabRepository, LabRepository>();
+
             services.AddHttpContextAccessor();
 
             return services;

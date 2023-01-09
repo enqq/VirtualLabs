@@ -32,6 +32,14 @@ namespace Infrastructure.Manager
 
         }
 
+        public bool CheckPosition(int valueId, int positionId)
+        {
+            var log = _dbContext.ValuesLogs.Include(x => x.Parent).FirstOrDefault(x => x.ID == valueId);
+            var position = _dbContext.Positions.Include(x => x.Lab).FirstOrDefault(x => x.ID == positionId);
+            
+            return position.Lab.MeasurementLogs.Contains(log.Parent);
+        }
+
         public async Task<ValuesLogs?> GetById(int id, Expression<Func<ValuesLogs, object>>? include = null)
         {
             if (include is null) return await _dbContext.ValuesLogs.FindAsync(id);
