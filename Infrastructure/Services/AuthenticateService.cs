@@ -5,6 +5,7 @@ using System.Text;
 using Application.Contracts;
 using Application.Models;
 using Application.Models.Dto;
+using AutoMapper;
 using Domain.Entities;
 using Infrastructure.Utils;
 using Microsoft.Extensions.Options;
@@ -17,10 +18,12 @@ namespace Infrastructure.Services
        
         private readonly IUserManager<User> _userManager;
         private readonly TokenSetting _token;
-        public AuthenticateService(IUserManager<User> userManager, IOptions<TokenSetting> token)
+        private readonly IMapper _mapper;
+        public AuthenticateService(IUserManager<User> userManager, IOptions<TokenSetting> token, IMapper mapper)
         {
             _userManager = userManager;
             _token = token.Value;
+            _mapper = mapper;
         }
 
         public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationRequest request)
@@ -29,14 +32,11 @@ namespace Infrastructure.Services
             if (user == null) throw new Exception("User doesn't exist");
             if (!PasswordUtils.ComparePassword(user.Password, request.Password)) throw new Exception("Incorect email or password");
 
+            var mapper = _mapper.Map<AuthenticationResponse>(user);
             var token = GenerateToken(user);
-            var response = new AuthenticationResponse() {
-               ID = user.ID.ToString(),
-               Email = user.Email,
-               Token = new JwtSecurityTokenHandler().WriteToken(token)
-            };
-
-            return await Task.FromResult(response);
+             mapper.Token = new JwtSecurityTokenHandler().WriteToken(token);
+                    
+            return await Task.FromResult(mapper);
         }
 
         public async Task<RegisterResponse> RegisterAsync(RegisterRequest request)
@@ -66,12 +66,14 @@ namespace Infrastructure.Services
             var token = new JwtSecurityTokenHandler().WriteToken(generateToken);
             return await Task.FromResult(token);
         }
-        public async Task<BaseResponse> CheckPasswordToken(string token)
+        public async Task<UserFullResponse> CheckPasswordToken(string token)
         {
-
-                var jwt = new JwtSecurityToken(token);
-                if (jwt.ValidFrom > DateTime.UtcNow || jwt.ValidTo < DateTime.UtcNow) throw new Exception("Token is invalid");
-                return await Task.FromResult(new BaseResponse(message: "Token is valid", status: true));
+            var jwt = new JwtSecurityToken(token);
+            if (jwt.ValidFrom > DateTime.UtcNow || jwt.ValidTo < DateTime.UtcNow) throw new Exception("Token is invalid");
+            var userId = jwt.Claims.SingleOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
+            var user = await _userManager.GetByIdAsync(int.Parse(userId));
+            var mapper = _mapper.Map<UserFullResponse>(user);
+            return mapper;
 
         }
 

@@ -16,10 +16,12 @@ namespace Application.Mapper
             CreateMap<ValuesLogs, ValueLogsPositionResponse>();
             CreateMap<User, UserResponse>();
             CreateMap<User, UserFullResponse>();
+            CreateMap<User, AuthenticationResponse>();
             CreateMap<UserGroup, UserGroupsResponse>();
             CreateMap<Lab, LabRespone>();
             CreateMap<Position, PositionResponse>();
             CreateMap<Position, PositionsListResponse>();
+
             //CreateMap<List<ValuesLogs>, List<ValueLogsResponse>>();
         }
     }

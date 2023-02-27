@@ -63,7 +63,8 @@ namespace WebApi.Controllers
         {
             try
             {
-                return Ok(await _auth.RegisterAsync(user));
+                await _auth.RegisterAsync(user);
+                return Ok();
             } catch (Exception e)
             {
                 return BadRequest(e.Message);

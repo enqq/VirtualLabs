@@ -17,7 +17,7 @@ namespace Application.Models
         public string Address { get; set; }
         public string City { get; set; }
         public string PostCode { get; set; }
-        public bool Active { get; set; }
+      //  public bool Active { get; set; }
         public UserRoles UserRole { get; set; }
     }
 }

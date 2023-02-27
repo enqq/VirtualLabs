@@ -36,6 +36,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin, Teacher")]
         public async Task<IActionResult> Create([FromBody] UserGroupsRequest request)
         {
             try
@@ -49,6 +50,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Admin, Teacher")]
         public async Task<IActionResult> Update([FromBody] UserGroupsUpdateRequest request)
         {
             try
@@ -88,6 +90,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost("insert/user/")]
+        [Authorize(Roles = "Admin, Teacher")]
         public async Task<IActionResult> InsertUserToGroup([FromBody]UserGroupsUserUpdateRequest request)
         {
             try
@@ -101,6 +104,7 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete("remove/user/")]
+        [Authorize(Roles = "Admin, Teacher")]
         public async Task<IActionResult> RemoveUserToGroup([FromBody] UserGroupsUserUpdateRequest request)
         {
             try

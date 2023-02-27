@@ -1,5 +1,6 @@
 ﻿using Application.Contracts;
 using Application.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebApi.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     public class ValueLogsController : Controller
     {
         private readonly IValueLogsRepository _vRepository;
@@ -44,6 +46,7 @@ namespace WebApi.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin, Teacher")]
         [HttpPost("insertPosition/{value:int}/{position:int}")]
         public async Task<IActionResult> InsertToPosition(int value, int position)
         {

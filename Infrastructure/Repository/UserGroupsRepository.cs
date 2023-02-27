@@ -42,6 +42,7 @@ namespace Infrastructure.Repository
 
         public async Task<UserGroupsResponse> InserUserToGroup(UserGroupsUserUpdateRequest request)
         {
+
             var user = await _userManager.GetByIdAsync(request.UserId);
             if (user == null) throw new Exception("Can't find user");
             var group = await _userGroupsManager.GetByIdAsync(request.Id);

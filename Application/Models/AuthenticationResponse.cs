@@ -1,10 +1,8 @@
 ﻿using System;
 namespace Application.Models
 {
-    public class AuthenticationResponse
+    public class AuthenticationResponse: UserFullResponse
     {
-        public string ID { get; set; }
-        public string Email { get; set; }
         public string Token { get; set; }
 
         public AuthenticationResponse()
